@@ -44,6 +44,7 @@ class ProxyRequest extends HTTP.ClientRequest
     @url = URL.parse("#{protocol}//#{host || "localhost"}:#{port}#{options.path || "/"}")
     @path = @url.path
     @headers = {}
+    @writable = true
     if options.headers
       for n,v of options.headers
         @headers[n.toLowerCase()] = v

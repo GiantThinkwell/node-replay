@@ -85,7 +85,10 @@ class Matcher
       for chunks in body
         data += chunks[0]
       data = jsStringEscape(data)
-      return false if @body != data
+      if @body instanceof RegExp
+        return @body.test data
+      else
+        return @body == data
     return true
 
 

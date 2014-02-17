@@ -116,6 +116,10 @@ class Catalog
       headers = parseHeaders(filename, header_lines, request_headers)
       body = headers["body"]
       delete headers["body"]
+      if /REGEXP\s/.test(body)
+        regexpBody = body.split("REGEXP ")[1]
+        [_, in_regexp, flags] = regexpBody.match(/^\/(.+)\/(i|m|g)?$/)
+        body = new RegExp(in_regexp, flags || "")
       return { url: path || regexp, method: method, headers: headers, body: body }
 
 

@@ -10,7 +10,11 @@ existsSync = File.existsSync || Path.existsSync
 
 existsSync = File.existsSync || Path.existsSync
 
+BINARY_TYPES = /(gzip|deflate|image)/
 
+isBinary = (headers) ->
+  (headers['content-encoding'] && headers['content-encoding'].match(BINARY_TYPES)) || (headers['content-type'] && headers['content-type'].match(BINARY_TYPES))
+  
 mkdir = (pathname, callback)->
   exists pathname, (found)->
     if found
@@ -86,7 +90,7 @@ class Catalog
         file.write "#{response.status || 200} HTTP/#{response.version || "1.1"}\n"
         writeHeaders file, response.headers
         file.write "\n"
-        if response.headers['content-encoding'] && response.headers['content-encoding'].match(/(gzip|deflate)/)
+        if isBinary(response.headers)
           file.write Buffer.concat(response.body).toString('base64')
         else
           for part in response.body
@@ -129,7 +133,7 @@ class Catalog
         status = parseInt(status_line.split()[0], 10)
         version = status_line.match(/\d.\d$/)
         headers = parseHeaders(filename, header_lines)
-        if headers['content-encoding'] && headers['content-encoding'].match(/(gzip|deflate)/)
+        if isBinary(headers)
           body =  new Buffer body.join(), 'base64'
         else
           body = body.join("\n\n")
